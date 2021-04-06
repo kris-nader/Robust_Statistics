@@ -1,9 +1,11 @@
 ## Computation using the Robust and sparse estimation of the inverse
 ## covariance matrix using rank correlation measures as reference
 
-#install.packages("robustbase")
-library(robustbase)
-library(huge)
+
+install.packages("robustbase")
+install.packages("huge")
+library("robustbase")
+library("huge")
 
 # Function to compute the perturbed (method='perturb') sample covariance matrix and
 # the nearest positive definite matrix by eliminating the negative eigenspaces (method='npd')
@@ -28,7 +30,7 @@ quadrant.transformed<-function(x,method="perturb"){
   x.m=apply(x,2,median)
   x=sweep(x,2,x.m)
   x.s=sign(x)
-  x.q=apply(x,2,Qn)
+  x.q=apply(x,2,Qn)# here Qn is from the package robustbase
   cor.quadrant=sin(pi*cor(x.s)/2)
   sigma.quadrant=diag(x.q)%*%cor.quadrant%*%diag(x.q)
   return(easy.psd(sigma.quadrant,method))
