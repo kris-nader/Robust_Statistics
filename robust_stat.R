@@ -1,29 +1,32 @@
 ## Computation using the Robust and sparse estimation of the inverse
 ## covariance matrix using rank correlation measures as reference
 
-install.packages("robustbase")
-library("robustbase")
+#install.packages("robustbase")
+library(robustbase)
+library(huge)
 
+# Function to compute the perturbed (method='perturb') sample covariance matrix and
+# the nearest positive definite matrix by eliminating the negative eigenspaces (method='npd')
 easy.psd<-function(sigma, method="perturb"){
   if (method=="perturb"){
-    p==ncol(sigma)
-    eig=eigen(sigma, symmetric = T, only.values = T)
-    const=abs(min(eig$values,0))
-    sigma.psd=sigma+diag(p)*const
+    p<-ncol(sigma)
+    eig<-eigen(sigma, symmetric = T, only.values = T) #only.values returns only eigenvalues
+    const<-abs(min(eig$values,0))
+    sigma.psd<-sigma+diag(p)*const
   }
   if(method=="npd"){
-    eig=eigen(sigma,symmetric = T)
-    d=pmax(eig$values,0)
-    sigma.psd=eig$vectors%*%
-      diag(d)%*%
-      t(eig$vectors)
+    eig<-eigen(sigma,symmetric = T)
+    d<-pmax(eig$values,0)
+    sigma.psd=eig$vectors%*%diag(d)%*%t(eig$vectors)
   }
   return (sigma.psd)
 }
 
+# Function that computes the robust sample covariance matrix with quadrant rank
+# correlation and made positive semidefinite.
 quadrant.transformed<-function(x,method="perturb"){
   x.m=apply(x,2,median)
-  x=sweep(x,2,x,m)
+  x=sweep(x,2,x.m)
   x.s=sign(x)
   x.q=apply(x,2,Qn)
   cor.quadrant=sin(pi*cor(x.s)/2)
@@ -31,6 +34,64 @@ quadrant.transformed<-function(x,method="perturb"){
   return(easy.psd(sigma.quadrant,method))
 }
 
+# Function that computes the robust sample covariance matrix with quadrant rank
+# correlation.
+quadrant.untransformed<-function(x){
+  x.m=apply(x,2,median)
+  x=sweep(x,2,x.m)
+  x.s=sign(x)
+  x.q=apply(x,2,Qn)
+  cor.quadrant=sin(pi*cor(x.s)/2)
+  sigma.quadrant=diag(x.q)%*%cor.quadrant%*%diag(x.q)
+  return(sigma.quadrant)
+}
 
+# Function that computes the robust sample covariance matrix with spearman rank
+# correlation and made positive semidefinite.
+spearman.transformed<-function(x,method="perturb")
+{
+  x.r=apply(x,2,rank)
+  x.q=apply(x,2,Qn)
+  cor.sp=2*sin(pi*cor(x.r)/6)
+  sigma.sp=diag(x.q)%*%cor.sp%*%diag(x.q)
+  return(easy.psd(sigma.sp,method))
+}
 
+# Function that computes the robust sample covariance matrix with spearman rank
+# correlation.
+spearman.untransformed<-function(x)
+{
+  x.r=apply(x,2,rank)
+  x.q=apply(x,2,Qn)
+  cor.sp=2*sin(pi*cor(x.r)/6)
+  sigma.sp=diag(x.q)%*%cor.sp%*%diag(x.q)
+  return(sigma.sp)
+}
 
+# Function that computes the robust sample covariance matrix with Gaussian rank
+# correlation.
+Grank<-function(x)
+{
+  n=nrow(x)
+  x.q=apply(x,2,Qn)
+  x.r=apply(x,2,rank)
+  cor.Grank=cor(qnorm(x.r/(n+1)))
+  sigma.quadrant=diag(x.q)%*%cor.Grank%*%diag(x.q)
+  return(sigma.quadrant)
+}
+
+# Function that computes the precision matrix given a (robust) sample covariance
+# matrix.
+theta.sparse<-function(sigma.psd,n)
+{
+  huge.out<-huge(sigma.psd,method="glasso",verbose=F)
+  my.bic=-huge.out$loglik+huge.out$df*log(n)/n
+  opt.i=which.min(my.bic)
+  return(huge.out$icov[[opt.i]])
+}
+
+kullback.leibler<-function(Theta, Theta.est) {
+  Theta.inv <- solve(Theta)
+  ID<-Theta.inv%*%Theta.est
+  return(sum(diag(ID))-log(det(ID))-ncol(Theta))
+}
