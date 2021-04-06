@@ -1,11 +1,13 @@
 ## Computation using the Robust and sparse estimation of the inverse
 ## covariance matrix using rank correlation measures as reference
 
+#if you have errors, uncomment and install these
+#install.packages("robustbase")
+#install.packages("huge")
 
-install.packages("robustbase")
-install.packages("huge")
 library("robustbase")
 library("huge")
+library("MASS")
 
 # Function to compute the perturbed (method='perturb') sample covariance matrix and
 # the nearest positive definite matrix by eliminating the negative eigenspaces (method='npd')
@@ -93,7 +95,7 @@ theta.sparse<-function(sigma.psd,n)
 }
 
 kullback.leibler<-function(Theta, Theta.est) {
-  Theta.inv <- solve(Theta)
+  Theta.inv <- ginv(Theta)
   ID<-Theta.inv%*%Theta.est
   return(sum(diag(ID))-log(det(ID))-ncol(Theta))
 }
