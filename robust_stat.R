@@ -94,8 +94,8 @@ theta.sparse<-function(sigma.psd,n)
   return(huge.out$icov[[opt.i]])
 }
 
-kullback.leibler<-function(Theta, Theta.est) {
-  Theta.inv <- ginv(Theta)
+kullback.leibler<-function(Theta.inv, Theta.est) {
+#  Theta.inv <- solve(Theta) ##I decided to get rid of this line as its probably computationally expensive
   ID<-Theta.inv%*%Theta.est
-  return(sum(diag(ID))-log(det(ID))-ncol(Theta))
+  return(sum(diag(ID))-log(det(ID))-ncol(Theta.inv))
 }
