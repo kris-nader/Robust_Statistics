@@ -45,7 +45,7 @@ quadrant.untransformed<-function(x){
   x=sweep(x,2,x.m)
   x.s=sign(x)
   x.q=apply(x,2,Qn)
-  cor.quadrant=sin(pi*cor(x.s)/2)
+  cor.quadrant=cor(x.s)
   sigma.quadrant=diag(x.q)%*%cor.quadrant%*%diag(x.q)
   return(sigma.quadrant)
 }
@@ -67,7 +67,7 @@ spearman.untransformed<-function(x)
 {
   x.r=apply(x,2,rank)
   x.q=apply(x,2,Qn)
-  cor.sp=2*sin(pi*cor(x.r)/6)
+  cor.sp=cor(x.r)
   sigma.sp=diag(x.q)%*%cor.sp%*%diag(x.q)
   return(sigma.sp)
 }
