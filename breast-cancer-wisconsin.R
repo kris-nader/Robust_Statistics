@@ -12,7 +12,7 @@ for (i in 1:699) {
 } # count = 16 observations with an NA out of 699 observations.
 # Let's just omit these observations
 data <- na.omit(data)
-
+data <- data[,-1]
 # We can now continue
 data.cov <- cov(data)
 data.prec <- solve(data.cov) #not singular
@@ -29,6 +29,6 @@ ths.sp.theta <- theta.sparse(threestep.spearman, n=nrow(data))
 twostep.gaussian <- Grank(data)
 tws.gauss.theta <- theta.sparse(twostep.gaussian, n=nrow(data))
 
-write.table(ths.quad.theta, file="breastW_quadrant.txt", row.names=FALSE, col.names=FALSE)
-write.table(ths.sp.theta, file="breastW_spearman.txt", row.names=FALSE, col.names=FALSE)
-write.table(tws.gauss.theta, file="breastW_gauss.txt", row.names=FALSE, col.names=FALSE)
+write.table(ths.quad.theta, file="breastW_quadrant.csv", sep=",", row.names=FALSE, col.names=FALSE)
+write.table(ths.sp.theta, file="breastW_spearman.csv", sep=",", row.names=FALSE, col.names=FALSE)
+write.table(tws.gauss.theta, file="breastW_gauss.csv", sep=",", row.names=FALSE, col.names=FALSE)

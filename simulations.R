@@ -24,7 +24,7 @@ simulate_precision<-function(n,p,M, bool.contaminated = 1) {
   # multivariate normal distribution and U_Theta stands for the
   # Upper triangular matrix in the Cholesky decomposition of Theta:
   # Theta = L_Theta%*%U_Theta (L_Theta = t(U_Theta))
-  if (p>n) {
+  if (p>=n) {
     sample.results<-matrix(0,M,6) #6 instead of 7 as we don't need to invert sample covariance.    
     colnames(sample.results) <- c("Glasso", "Twostep Quadrant", "Threestep Quadrant", "Twostep Spearman", "Threestep Spearman", "Gaussian")
     FP<-matrix(0,M,6)
@@ -102,7 +102,7 @@ simulate_precision<-function(n,p,M, bool.contaminated = 1) {
     # print("eight")
     FP[i,6] <- sum(tws.gauss.theta[which(Theta1sparse_log)]!=0)/FP_den
     FN[i,6] <- sum(tws.gauss.theta[which(!Theta1sparse_log)]==0)/FN_den
-    if (p<=n) {
+    if (p<n) {
       #precision matrix obtained by inverting S
       S.inv <- chol2inv(chol(S))
       inv.theta.KL <- kullback.leibler(Theta1.inv,S.inv)

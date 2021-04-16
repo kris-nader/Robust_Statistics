@@ -133,6 +133,3 @@ twostep.gaussian <- Grank(data)
 write.table(twostep.gaussian, "golub_gauss_S.csv", sep=",",  row.names=FALSE, col.names=FALSE)
 tws.gauss.theta <- theta.sparse(twostep.gaussian, n=nrows)
 write.table(tws.gauss.theta, "golub_gauss_theta.csv", sep=",",  row.names=FALSE, col.names=FALSE)
-
-
-
